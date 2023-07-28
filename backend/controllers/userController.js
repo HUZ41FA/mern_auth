@@ -5,6 +5,7 @@ import generateToken from '../utils/generateToken.js';
 const authUser = asyncHandler(async (req, res) => {
     const {email, password} = req.body;
     const user = await User.findOne({email:email});
+    
     if(user && (await user.matchPassword(password))){
         generateToken(res, user._id);
         res.status(200).json({
@@ -12,7 +13,7 @@ const authUser = asyncHandler(async (req, res) => {
             email : user.email
         })
     }else{
-        res.status(403);
+        res.status(401);
         throw new Error("Invalid email or password")
     }
 
@@ -56,11 +57,34 @@ const logoutUser = asyncHandler(async(req, res)=>{
 });
 
 const getUserProfile = asyncHandler(async(req, res)=>{
-    res.status(200).json({message:"User Profile"})
+    const data = {
+        _id : req.user._id,
+        name : req.user.name,
+        email : req.user.email,
+    }
+    res.status(200).json({user: data})
 });
 
 const updateUserProfile = asyncHandler(async(req, res)=>{
-    res.status(200).json({message:"User Profile Updated"})
+    const user = await User.findById(req.user._id);
+
+    if(user){
+        user.name = req.body.name || user.name;
+        user.email = req.body.email || user.email;
+
+        const updatedUser = await user.save();
+
+        res.status(200).json({
+            name : updatedUser.name,
+            email : updatedUser.email,
+        })
+
+    }else{
+        res.status(404)
+        throw new Error("User not found");
+    }
+
+
 });
 
 export {

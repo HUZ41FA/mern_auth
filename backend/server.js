@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js'
@@ -14,6 +15,8 @@ const app = express()
 
 app.use(express.urlencoded({extended:true}));
 app.use(express.json({extended:true}));
+app.use(cookieParser());
+
 app.use(`/api/${apiVersion}/users`, userRoutes);
 
 app.use(notFound);
