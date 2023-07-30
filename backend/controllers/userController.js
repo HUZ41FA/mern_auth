@@ -2,6 +2,13 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
 
+// We can also write a custom asyncError handler instead of using the express-async-handler package;
+// const asyncErrorHandler = (func) => {
+//     return (req, res, next) => {
+//         func(req, res, next).catch(err => next(err))
+//     }
+// }
+
 const authUser = asyncHandler(async (req, res) => {
     const {email, password} = req.body;
     const user = await User.findOne({email:email});
@@ -16,7 +23,6 @@ const authUser = asyncHandler(async (req, res) => {
         res.status(401);
         throw new Error("Invalid email or password")
     }
-
 });
 
 const registerNewUser = asyncHandler(async(req, res)=>{
