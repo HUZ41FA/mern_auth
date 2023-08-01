@@ -1,13 +1,28 @@
 import React from "react";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {Form, Button, Row, Col} from 'react-bootstrap';
 import FormContainer from "../components/FormContainer";
+import { useSelector, useDispatch } from "react-redux";
+import { setCredentials } from "../slices/authSlice";
+import { useLoginMutation } from "../slices/usersAPISlice";
 
 const Login = () => {
     const [formData, setFormData] = React.useState({
         email: "",
         password: "",
     })
+
+    const navigate = useNavigate();
+    const dispath = useDispatch();
+    const [login, {isLoading, isError}] = useLoginMutation();
+    const {userInfo} = useSelector(state=>state.auth);
+
+    React.useEffect(()=>{
+        if(userInfo){
+            navigate("/")
+        }
+    }, [navigate, userInfo])
+
 
     const handleTextFieldChange = (event) => {
         const name = event.target.name;
@@ -24,6 +39,13 @@ const Login = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         console.log(formData);
+
+        try{
+            const res = await login({email, password}).unwrap();
+            dispath(setCredentials({...res}))
+        }catch(error){
+            console.error(error)
+        }
     }
 
     return (
@@ -43,7 +65,6 @@ const Login = () => {
                             onChange={handleTextFieldChange}
                         ></Form.Control>
                     </Form.Group>
-
                     <Form.Group controlId='password' className="mt-3">
                         <Form.Label><b>Password</b></Form.Label>
                         <Form.Control
@@ -54,15 +75,7 @@ const Login = () => {
                             onChange={handleTextFieldChange}
                         ></Form.Control>
                     </Form.Group>
-
-                    <Button 
-                        type='submit'
-                        variant='primary'
-                        className='mt-3'
-                        >
-                            Log in
-                    </Button>
-
+                    <Button type='submit' variant='primary' className='mt-3'>Log in</Button>
                     <Row className='py-3'>
                         <Col>
                             New user? <Link to='/register'>register</Link>
