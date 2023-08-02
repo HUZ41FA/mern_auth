@@ -79,9 +79,7 @@ const Login = () => {
                             onChange={handleTextFieldChange}
                         ></Form.Control>
                     </Form.Group>
-                    
-                        
-                    <Button type='submit' variant='primary' className='mt-3'>
+                    <Button type='submit' variant='primary' className='mt-3 w-100'>
                         {
                             isLoading ?
                             <Loader/>

@@ -109,7 +109,7 @@ const Register = () => {
                     <Button 
                         type='submit'
                         variant='primary'
-                        className='mt-3'
+                        className='mt-3 w-100'
                         >
                             {
                                 isLoading ?

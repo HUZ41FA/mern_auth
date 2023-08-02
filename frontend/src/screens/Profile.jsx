@@ -6,7 +6,7 @@ import Loader from "../components/Loader";
 import { setCredentials } from "../slices/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { useRegisterMutation } from "../slices/usersAPISlice";
+import { useUpdateUserMutation } from "../slices/usersAPISlice";
 
 const Register = () => {
     const [formData, setFormData] = React.useState({
@@ -19,13 +19,17 @@ const Register = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const userInfo = useSelector(state=>state.auth).userInfo;
-    const [register, {isLoading}] = useRegisterMutation();
+    const [updateUser, {isLoading}] = useUpdateUserMutation();
 
     React.useEffect(()=>{
-        if(userInfo){
-            navigate("/");
-        }
-    })
+        setFormData(prevFormData=>{
+            return {
+                ...prevFormData,
+                name: userInfo.name,
+                email: userInfo.email
+            }
+        })
+    }, [userInfo.name, userInfo.email])
 
 
     const handleTextFieldChange = (event) => {
@@ -42,16 +46,12 @@ const Register = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if(formData.confirmPassword != formData.password){
-            toast.error('Passwords do not match')
-        }else{
-            try{
-                const res = await register({name:formData.name, email:formData.email, password:formData.password, confirmPassword:formData.confirmPassword}).unwrap();
-                dispatch(setCredentials({ ...res }));
-                navigate('/');
-            }catch(error){
-                toast.error(error?.data?.message || error.error);
-            }
+        try{
+            const res = await updateUser({_id:userInfo._id, name:formData.name, email:formData.email}).unwrap();
+            dispatch(setCredentials({...res}));
+            toast.success("Profile Updated!");
+        }catch(error){
+            toast.error(error?.data?.message || error.error);
         }
     }
 
@@ -59,7 +59,7 @@ const Register = () => {
         <>
             <FormContainer>
                 <h1>
-                   Sign Up 
+                   Your Profile
                 </h1>
                 <Form onSubmit={handleSubmit}>
                     <Form.Group controlId='name' className="mt-3">
@@ -83,48 +83,18 @@ const Register = () => {
                             onChange={handleTextFieldChange}
                         ></Form.Control>
                     </Form.Group>
-
-                    <Form.Group controlId='password' className="mt-3">
-                        <Form.Label><b>Password</b></Form.Label>
-                        <Form.Control
-                            type="password"
-                            name="password"
-                            placeholder="Enter Password"
-                            value={formData.password}
-                            onChange={handleTextFieldChange}
-                        ></Form.Control>
-                    </Form.Group>
-
-                    <Form.Group controlId='confirmPassword' className="mt-3">
-                        <Form.Label><b>Confirm Password</b></Form.Label>
-                        <Form.Control
-                            type="password"
-                            name="confirmPassword"
-                            placeholder="Re-Enter Password"
-                            value={formData.confirmPassword}
-                            onChange={handleTextFieldChange}
-                        ></Form.Control>
-                    </Form.Group>
-
                     <Button 
                         type='submit'
                         variant='primary'
-                        className='mt-3'
+                        className='mt-4 w-100'
                         >
                             {
                                 isLoading ?
                                 <Loader/>
                                 :
-                                "Register"
+                                "Update"
                             }
                     </Button>
-
-                    <Row className='py-3'>
-                        <Col>
-                            Already have an account? <Link to='/login'>Login</Link>
-                        </Col>
-                    </Row>
-                    
                 </Form>
             </FormContainer>
         </>
