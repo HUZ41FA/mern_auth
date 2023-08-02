@@ -17,7 +17,8 @@ const authUser = asyncHandler(async (req, res) => {
         generateToken(res, user._id);
         res.status(200).json({
             _id : user._id,
-            email : user.email
+            email : user.email,
+            name: user.name
         })
     }else{
         res.status(401);
@@ -26,7 +27,12 @@ const authUser = asyncHandler(async (req, res) => {
 });
 
 const registerNewUser = asyncHandler(async(req, res)=>{
-    const { name, email, password } = req.body;
+    const { name, email, password, confirmPassword } = req.body;
+
+    if(password != confirmPassword){
+        res.status(400);
+        throw Error("Passwords donot match");
+    }
 
     const userExists = await User.findOne({email:email})
 

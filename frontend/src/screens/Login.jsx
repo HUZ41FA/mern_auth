@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import {Form, Button, Row, Col} from 'react-bootstrap';
 import FormContainer from "../components/FormContainer";
 import { useSelector, useDispatch } from "react-redux";
-import { setCredentials } from "../slices/authSlice";
+import { setCredentials } from "../slices/AuthSlice";
 import { useLoginMutation } from "../slices/usersAPISlice";
+import { toast } from "react-toastify";
+import Loader from '../components/Loader';
 
 const Login = () => {
     const [formData, setFormData] = React.useState({
@@ -41,10 +43,12 @@ const Login = () => {
         console.log(formData);
 
         try{
-            const res = await login({email, password}).unwrap();
+            const res = await login({email:formData.email, password:formData.password}).unwrap();
             dispath(setCredentials({...res}))
+            toast.success("Logged in!")
+            navigate("/")
         }catch(error){
-            console.error(error)
+            toast.error(error?.data?.message || error.error)
         }
     }
 
@@ -75,7 +79,17 @@ const Login = () => {
                             onChange={handleTextFieldChange}
                         ></Form.Control>
                     </Form.Group>
-                    <Button type='submit' variant='primary' className='mt-3'>Log in</Button>
+                    
+                        
+                    <Button type='submit' variant='primary' className='mt-3'>
+                        {
+                            isLoading ?
+                            <Loader/>
+                            :
+                            "Log In"
+                        }
+                    </Button>
+                    
                     <Row className='py-3'>
                         <Col>
                             New user? <Link to='/register'>register</Link>

@@ -1,11 +1,9 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { fetchBaseQuery, createApi } from '@reduxjs/toolkit/query/react';
 
-
-// The base URL is empty string, because we are using proxy vite.config.js
-const baseQuery = fetchBaseQuery({baseUrl: ""})
+// Base url is empty string because we are using proxy in vite.config.js
+const baseQuery = fetchBaseQuery({ baseUrl: '' });
 
 export const apiSlice = createApi({
-    baseQuery,
-    tagTypes: ['User'], // For Caching
-    endpoints: (builder)=>({})
-})
+  baseQuery,
+  endpoints: () => ({}),
+});
